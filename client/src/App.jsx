@@ -98,7 +98,7 @@ function SecurityWrapper({ children }) {
       inactivityTimer = setTimeout(async () => {
         sessionStorage.removeItem('recoveryPassword');
         await supabase.auth.signOut();
-      }, 300000); // 5 minutes
+      }, 60000); // 1 minute
     };
 
     const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
