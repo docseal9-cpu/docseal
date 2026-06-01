@@ -40,13 +40,10 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
     // 3. Delete (type === 'delete') -> falls through to prompt for password!
     if (recoveryPassword) {
       if (type === 'download' || type === 'secure-download') {
-        alert("DEBUG: Fast path activated! Type: " + type + ". Bypassing password modal now.");
         const action = { type, fileId, fileName };
         // Do not set pendingAction so modal never flickers
         handleVerificationSubmit(null, recoveryPassword, action, true);
         return;
-      } else {
-        alert("DEBUG: We skipped the fast path because type is " + type + ", so the password modal WILL show.");
       }
     }
 
