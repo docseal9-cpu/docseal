@@ -11,7 +11,7 @@ export default function AuditLogs({ session }) {
 
   const fetchLogs = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/logs', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/logs`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
