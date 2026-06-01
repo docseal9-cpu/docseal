@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { supabase } from './supabaseClient';
+import { API_BASE } from './config';
 import Auth from './components/Auth';
 import Sidebar from './components/Sidebar';
 import logo from './assets/logo.png';
@@ -8,7 +10,6 @@ import Uploader from './components/Uploader';
 import FileList from './components/FileList';
 import EmergencyAssets from './components/EmergencyAssets';
 import AuditLogs from './components/AuditLogs';
-import { supabase } from './supabaseClient';
 
 function VaultDashboard({ session }) {
   const [files, setFiles] = useState([]);
@@ -19,7 +20,7 @@ function VaultDashboard({ session }) {
 
   const fetchFiles = async () => {
     try {
-      const response = await fetch(`/api/files`, {
+      const response = await fetch(`${API_BASE}/api/files`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -37,7 +38,7 @@ function VaultDashboard({ session }) {
 
   const handleDelete = async (fileId) => {
     try {
-      const response = await fetch(`/api/files/${fileId}`, {
+      const response = await fetch(`${API_BASE}/api/files/${fileId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.access_token}`

@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import { encryptFile } from '../crypto';
+import { API_BASE } from '../config';
 
 export default function Uploader({ onUploadComplete, session }) {
   const [isDragging, setIsDragging] = useState(false);
@@ -131,7 +132,7 @@ export default function Uploader({ onUploadComplete, session }) {
         });
       }, 200);
 
-      const response = await fetch(`/api/upload`, {
+      const response = await fetch(`${API_BASE}/api/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.access_token}`

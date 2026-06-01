@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import logo from '../assets/logo.png';
+import { API_BASE } from '../config';
 
 export default function Auth() {
   // 'landing', 'signin', 'signup', 'recover'
@@ -62,7 +63,7 @@ export default function Auth() {
     try {
       if (view === 'recover') {
         // Fetch the payload from the server with identity verification
-        const response = await fetch(`/api/recovery-payload`, {
+        const response = await fetch(`${API_BASE}/api/recovery-payload`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 

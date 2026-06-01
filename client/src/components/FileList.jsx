@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { decryptFile } from '../crypto';
+import { API_BASE } from '../config';
 
 export default function FileList({ files, onDelete, session, requirePasswordForDelete }) {
   const [pendingAction, setPendingAction] = useState(null); // { type: 'download' | 'delete' | 'secure-download', fileId: string, fileName: string }
@@ -101,7 +102,7 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
 
   const executeDecryptForPreview = async (fileId, fileName, password) => {
     try {
-      const response = await fetch(`/api/download/${fileId}`, {
+      const response = await fetch(`${API_BASE}/api/download/${fileId}`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }

@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../supabaseClient';
+import { API_BASE } from '../config';
 
 export default function AuditLogs({ session }) {
   const [logs, setLogs] = useState([]);
@@ -11,7 +13,7 @@ export default function AuditLogs({ session }) {
 
   const fetchLogs = async () => {
     try {
-      const response = await fetch(`/api/logs`, {
+      const response = await fetch(`${API_BASE}/api/logs`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
