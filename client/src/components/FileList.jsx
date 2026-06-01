@@ -31,17 +31,22 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
     return '📁';
   };
 
-  const initiateAction = async (type, fileId, fileName) => {
+  const initiateAction = (type, fileId, fileName) => {
     const recoveryPassword = sessionStorage.getItem('recoveryPassword');
-    
-    // Always force password verification for deletes, but allow cached passwords for downloads
-    if (recoveryPassword && type !== 'delete') {
-      if (type === 'download') {
-        await executeDecryptForPreview(fileId, fileName, recoveryPassword);
-      } else if (type === 'secure-download') {
-        triggerBrowserDownload(previewFile.blob, previewFile.name);
-        closePreview();
-      }
+
+    // Fast-path for emergency vault viewers (bypasses prompt completely)
+    if (isEmergencyVault && recoveryPassword && type === 'download') {
+      const action = { type, fileId, fileName };
+      setPendingAction(action);
+      handleVerificationSubmit(null, recoveryPassword, action);
+      return;
+    }
+
+    // If it's a secure-download from the preview, we can skip the password if we already have it cached
+    if (type === 'secure-download' && previewFile && previewFile.cachedPassword) {
+      const action = { type, fileId, fileName };
+      setPendingAction(action);
+      handleVerificationSubmit(null, previewFile.cachedPassword, action);
       return;
     }
 
@@ -65,23 +70,26 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
     return defaultType;
   };
 
-  const handleVerificationSubmit = async (e) => {
-    e.preventDefault();
+  const handleVerificationSubmit = async (e, overridePassword = null, overrideAction = null) => {
+    if (e) e.preventDefault();
     setIsVerifying(true);
     setVerifyError(null);
 
+    const passwordToUse = overridePassword || verifyPassword;
+    const action = overrideAction || pendingAction;
+
     try {
-      if (pendingAction.type === 'secure-download') {
+      if (action.type === 'secure-download') {
         // Fast-path for double authentication: check against the cached password
         // used to decrypt the preview, avoiding a redundant network call that can hang.
-        if (verifyPassword !== previewFile.cachedPassword) {
+        if (passwordToUse !== previewFile.cachedPassword) {
           throw new Error('Incorrect Master Password');
         }
       } else {
         // Full verification for initial decrypt or delete
         const { error } = await supabase.auth.signInWithPassword({
           email: session.user.email,
-          password: verifyPassword
+          password: passwordToUse
         });
 
         if (error) {
@@ -90,8 +98,8 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
       }
 
       // Password verified!
-      const actionToExecute = pendingAction;
-      const cachedPassword = verifyPassword;
+      const actionToExecute = action;
+      const cachedPassword = passwordToUse;
       cancelAction();
 
       if (actionToExecute.type === 'download') {
