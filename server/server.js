@@ -234,6 +234,15 @@ app.get('/api/logs', async (req, res) => {
     }
 });
 
+// Serve Static Frontend (for Render unified deployment)
+const clientDistPath = path.join(__dirname, '../client/dist');
+if (fs.existsSync(clientDistPath)) {
+    app.use(express.static(clientDistPath));
+    app.use((req, res) => {
+        res.sendFile(path.join(clientDistPath, 'index.html'));
+    });
+}
+
 app.listen(PORT, () => {
     console.log(`Secure Vault backend running on http://localhost:${PORT}`);
 });

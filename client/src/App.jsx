@@ -19,7 +19,7 @@ function VaultDashboard({ session }) {
 
   const fetchFiles = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/files`, {
+      const response = await fetch(`/api/files`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -37,7 +37,7 @@ function VaultDashboard({ session }) {
 
   const handleDelete = async (fileId) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/files/${fileId}`, {
+      const response = await fetch(`/api/files/${fileId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.access_token}`

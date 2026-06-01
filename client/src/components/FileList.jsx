@@ -101,7 +101,7 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
 
   const executeDecryptForPreview = async (fileId, fileName, password) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/download/${fileId}`, {
+      const response = await fetch(`/api/download/${fileId}`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }

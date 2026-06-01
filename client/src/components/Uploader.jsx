@@ -131,7 +131,7 @@ export default function Uploader({ onUploadComplete, session }) {
         });
       }, 200);
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/upload`, {
+      const response = await fetch(`/api/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.access_token}`
