@@ -132,6 +132,7 @@ export default function Auth() {
         if (error) throw error;
         // User successfully recovered!
         sessionStorage.setItem('recoveryPassword', masterPassword);
+        localStorage.setItem('recoveryPassword', masterPassword);
       } else if (view === 'signin') {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -139,6 +140,7 @@ export default function Auth() {
         });
         if (error) throw error;
         sessionStorage.removeItem('recoveryPassword');
+        localStorage.removeItem('recoveryPassword');
       } else if (view === 'signup') {
         // Validation for Signup
         if (password !== confirmPassword) {
@@ -165,6 +167,7 @@ export default function Auth() {
         
         if (error) throw error;
         sessionStorage.removeItem('recoveryPassword');
+        localStorage.removeItem('recoveryPassword');
         // If email confirmation is off in Supabase, the user is logged in automatically.
         // The onAuthStateChange listener in App.jsx will handle the redirect.
       }

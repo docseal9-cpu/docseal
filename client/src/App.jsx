@@ -98,6 +98,7 @@ function SecurityWrapper({ children }) {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(async () => {
         sessionStorage.removeItem('recoveryPassword');
+        localStorage.removeItem('recoveryPassword');
         await supabase.auth.signOut();
       }, 60000); // 1 minute
     };

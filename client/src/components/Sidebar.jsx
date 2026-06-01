@@ -5,6 +5,7 @@ import logo from '../assets/logo.png';
 export default function Sidebar() {
   const handleSignOut = async () => {
     sessionStorage.removeItem('recoveryPassword');
+    localStorage.removeItem('recoveryPassword');
     try {
       await supabase.auth.signOut();
     } catch (e) {
