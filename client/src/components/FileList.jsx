@@ -34,19 +34,19 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
   const initiateAction = (type, fileId, fileName) => {
     const recoveryPassword = sessionStorage.getItem('recoveryPassword');
 
-    // Fast-path for emergency vault viewers (bypasses prompt completely)
-    if (isEmergencyVault && recoveryPassword && type === 'download') {
+    // Fast-path for emergency vault viewers (bypasses prompt completely for view and delete)
+    if (isEmergencyVault && recoveryPassword && (type === 'download' || type === 'delete')) {
       const action = { type, fileId, fileName };
-      setPendingAction(action);
-      handleVerificationSubmit(null, recoveryPassword, action);
+      // Do not set pendingAction so modal never flickers
+      handleVerificationSubmit(null, recoveryPassword, action, true);
       return;
     }
 
     // If it's a secure-download from the preview, we can skip the password if we already have it cached
     if (type === 'secure-download' && previewFile && previewFile.cachedPassword) {
       const action = { type, fileId, fileName };
-      setPendingAction(action);
-      handleVerificationSubmit(null, previewFile.cachedPassword, action);
+      // Do not set pendingAction so modal never flickers
+      handleVerificationSubmit(null, previewFile.cachedPassword, action, true);
       return;
     }
 
@@ -70,30 +70,34 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
     return defaultType;
   };
 
-  const handleVerificationSubmit = async (e, overridePassword = null, overrideAction = null) => {
+  const handleVerificationSubmit = async (e, overridePassword = null, overrideAction = null, skipAuth = false) => {
     if (e) e.preventDefault();
-    setIsVerifying(true);
-    setVerifyError(null);
+    if (!skipAuth) {
+      setIsVerifying(true);
+      setVerifyError(null);
+    }
 
     const passwordToUse = overridePassword || verifyPassword;
     const action = overrideAction || pendingAction;
 
     try {
-      if (action.type === 'secure-download') {
-        // Fast-path for double authentication: check against the cached password
-        // used to decrypt the preview, avoiding a redundant network call that can hang.
-        if (passwordToUse !== previewFile.cachedPassword) {
-          throw new Error('Incorrect Master Password');
-        }
-      } else {
-        // Full verification for initial decrypt or delete
-        const { error } = await supabase.auth.signInWithPassword({
-          email: session.user.email,
-          password: passwordToUse
-        });
+      if (!skipAuth) {
+        if (action.type === 'secure-download') {
+          // Fast-path for double authentication: check against the cached password
+          // used to decrypt the preview, avoiding a redundant network call that can hang.
+          if (passwordToUse !== previewFile.cachedPassword) {
+            throw new Error('Incorrect Master Password');
+          }
+        } else {
+          // Full verification for initial decrypt or delete
+          const { error } = await supabase.auth.signInWithPassword({
+            email: session.user.email,
+            password: passwordToUse
+          });
 
-        if (error) {
-          throw new Error('Incorrect Master Password');
+          if (error) {
+            throw new Error('Incorrect Master Password');
+          }
         }
       }
 
