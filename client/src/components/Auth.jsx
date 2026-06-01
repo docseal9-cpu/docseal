@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { supabase } from '../supabaseClient';
+import logo from '../assets/logo.png';
 
 export default function Auth() {
   // 'landing', 'signin', 'signup', 'recover'
@@ -179,7 +180,7 @@ export default function Auth() {
         <div className="landing-page-simple animated">
           <nav className="landing-nav-simple">
             <div className="landing-logo">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '0.25rem' }}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <img src={logo} alt="DocSeal Logo" className="landing-logo-img" style={{ mixBlendMode: 'screen' }} />
               <span>DocSeal</span>
             </div>
             <button className="btn btn-outline" onClick={() => setView('signin')}>Login</button>
