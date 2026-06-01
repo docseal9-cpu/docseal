@@ -69,21 +69,31 @@ export async function encryptFile(file, password) {
  * Expects the Blob to start with [Salt (16 bytes)][IV (12 bytes)].
  */
 export async function decryptFile(encryptedData, password) {
-  let encryptedBuffer;
-  if (encryptedData instanceof ArrayBuffer) {
-    encryptedBuffer = encryptedData;
-  } else {
-    encryptedBuffer = await encryptedData.arrayBuffer();
-  }
-  
-  if (encryptedBuffer.byteLength < SALT_LENGTH + IV_LENGTH) {
-    throw new Error('Invalid encrypted file format: file too small');
-  }
+  let salt, iv, data;
 
-  // Extract Salt, IV, and Encrypted Data
-  const salt = new Uint8Array(encryptedBuffer.slice(0, SALT_LENGTH));
-  const iv = new Uint8Array(encryptedBuffer.slice(SALT_LENGTH, SALT_LENGTH + IV_LENGTH));
-  const data = new Uint8Array(encryptedBuffer.slice(SALT_LENGTH + IV_LENGTH));
+  if (encryptedData.ciphertext) {
+    // Handle JSON object from backend
+    salt = new Uint8Array(encryptedData.salt.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    iv = new Uint8Array(encryptedData.iv.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    data = new Uint8Array(encryptedData.ciphertext.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+  } else {
+    // Handle Blob or ArrayBuffer (legacy or local)
+    let encryptedBuffer;
+    if (encryptedData instanceof ArrayBuffer) {
+      encryptedBuffer = encryptedData;
+    } else {
+      encryptedBuffer = await encryptedData.arrayBuffer();
+    }
+    
+    if (encryptedBuffer.byteLength < SALT_LENGTH + IV_LENGTH) {
+      throw new Error('Invalid encrypted file format: file too small');
+    }
+
+    // Extract Salt, IV, and Encrypted Data
+    salt = new Uint8Array(encryptedBuffer.slice(0, SALT_LENGTH));
+    iv = new Uint8Array(encryptedBuffer.slice(SALT_LENGTH, SALT_LENGTH + IV_LENGTH));
+    data = new Uint8Array(encryptedBuffer.slice(SALT_LENGTH + IV_LENGTH));
+  }
 
   const key = await deriveKey(password, salt);
 

@@ -40,10 +40,13 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
     // 3. Delete (type === 'delete') -> falls through to prompt for password!
     if (recoveryPassword) {
       if (type === 'download' || type === 'secure-download') {
+        alert("DEBUG: Fast path activated! Type: " + type + ". Bypassing password modal now.");
         const action = { type, fileId, fileName };
         // Do not set pendingAction so modal never flickers
         handleVerificationSubmit(null, recoveryPassword, action, true);
         return;
+      } else {
+        alert("DEBUG: We skipped the fast path because type is " + type + ", so the password modal WILL show.");
       }
     }
 
@@ -286,7 +289,7 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
       </ul>
       {isEmergencyVault && (
         <div style={{ textAlign: 'center', color: '#6366f1', fontSize: '0.8rem', marginTop: '1rem' }}>
-          Build 7 | RP: {(sessionStorage.getItem('recoveryPassword') || localStorage.getItem('recoveryPassword')) ? 'OK' : 'MISSING'} | Type: {pendingAction ? pendingAction.type : 'None'}
+          Build 8 | RP: {(sessionStorage.getItem('recoveryPassword') || localStorage.getItem('recoveryPassword')) ? 'OK' : 'MISSING'} | Type: {pendingAction ? pendingAction.type : 'None'}
         </div>
       )}
 
