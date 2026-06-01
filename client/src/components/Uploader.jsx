@@ -28,22 +28,7 @@ export default function Uploader({ onUploadComplete, session }) {
   };
 
   const handleFileSelection = async (file) => {
-    const recoveryPassword = sessionStorage.getItem('recoveryPassword');
-    if (recoveryPassword) {
-      setIsUploading(true);
-      setUploadProgress(10);
-      try {
-        const encryptedBlob = await encryptFile(file, recoveryPassword);
-        setUploadProgress(40);
-        uploadFile(encryptedBlob, file.name, file.type);
-      } catch (err) {
-        console.error('Encryption failed', err);
-        alert('Encryption failed during recovery mode.');
-        setIsUploading(false);
-      }
-    } else {
-      setPendingFile(file);
-    }
+    setPendingFile(file);
   };
 
   const handleDrop = (e) => {
