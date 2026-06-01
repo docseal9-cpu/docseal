@@ -176,8 +176,9 @@ app.get('/api/download/:id', async (req, res) => {
         await logAction(req.user.id, 'DECRYPT', data.originalName);
 
         // Serve the encrypted blob directly back to the client
-        const fileStream = fs.createReadStream(encryptedFilePath);
-        fileStream.pipe(res);
+        // On Vercel, piping a stream can sometimes corrupt binary responses, so we send the buffer directly.
+        const fileBuffer = fs.readFileSync(encryptedFilePath);
+        res.send(fileBuffer);
     } catch (error) {
         console.error('Download error:', error);
         if (!res.headersSent) {
