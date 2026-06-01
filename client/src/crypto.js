@@ -68,8 +68,13 @@ export async function encryptFile(file, password) {
  * Decrypts a Blob using the provided password.
  * Expects the Blob to start with [Salt (16 bytes)][IV (12 bytes)].
  */
-export async function decryptFile(encryptedBlob, password) {
-  const encryptedBuffer = await encryptedBlob.arrayBuffer();
+export async function decryptFile(encryptedData, password) {
+  let encryptedBuffer;
+  if (encryptedData instanceof ArrayBuffer) {
+    encryptedBuffer = encryptedData;
+  } else {
+    encryptedBuffer = await encryptedData.arrayBuffer();
+  }
   
   if (encryptedBuffer.byteLength < SALT_LENGTH + IV_LENGTH) {
     throw new Error('Invalid encrypted file format: file too small');

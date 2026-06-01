@@ -110,11 +110,11 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
       
       if (!response.ok) throw new Error('Download failed');
       
-      // 1. Get the encrypted blob from the server
-      const encryptedBlob = await response.blob();
+      // 1. Get the encrypted data from the server
+      const encryptedBuffer = await response.arrayBuffer();
       
       // 2. Client-Side Decryption
-      const decryptedBlob = await decryptFile(encryptedBlob, password);
+      const decryptedBlob = await decryptFile(encryptedBuffer, password);
       
       // 3. Find MIME type from original files list
       const fileRecord = files.find(f => f.id === fileId);

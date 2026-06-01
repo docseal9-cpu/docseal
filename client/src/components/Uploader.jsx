@@ -113,11 +113,8 @@ export default function Uploader({ onUploadComplete, session }) {
   };
 
   const uploadFile = async (encryptedBlob, originalName, originalType) => {
-    // Generate a new File object from the blob to send via FormData
-    const finalFile = new File([encryptedBlob], originalName, { type: originalType || 'application/octet-stream' });
-    
     const formData = new FormData();
-    formData.append('file', finalFile);
+    formData.append('file', encryptedBlob, originalName);
     formData.append('is_emergency', isEmergency);
 
     try {
