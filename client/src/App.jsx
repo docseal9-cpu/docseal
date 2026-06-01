@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Auth from './components/Auth';
 import Sidebar from './components/Sidebar';
+import logo from './assets/logo.png';
 import Profile from './components/Profile';
 import Uploader from './components/Uploader';
 import FileList from './components/FileList';
@@ -84,10 +85,17 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const fetchSession = async () => {
+      // Ensure splash screen is visible for at least 2 seconds for the animation
+      const minDelay = new Promise(resolve => setTimeout(resolve, 2000));
+      const sessionPromise = supabase.auth.getSession();
+      
+      const [_, { data: { session } }] = await Promise.all([minDelay, sessionPromise]);
       setSession(session);
       setLoading(false);
-    });
+    };
+    
+    fetchSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
@@ -98,9 +106,11 @@ function App() {
 
   if (loading) {
     return (
-      <div className="loading-screen animated">
-        <div className="loader"></div>
-        <div className="loading-text">Initializing DocSeal...</div>
+      <div className="splash-screen">
+        <div className="splash-content">
+          <img src={logo} alt="DocSeal Logo" className="splash-logo" />
+          <h1 className="splash-text">DocSeal</h1>
+        </div>
       </div>
     );
   }
