@@ -61,7 +61,7 @@ export default function Auth() {
     try {
       if (view === 'recover') {
         // Fetch the payload from the server with identity verification
-        const response = await fetch('http://localhost:3000/api/recovery-payload', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/recovery-payload`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
