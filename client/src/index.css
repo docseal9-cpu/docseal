@@ -312,6 +312,11 @@ body {
   100% { transform: scale(1); opacity: 0.8; filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.4)); }
 }
 
+@keyframes progressFill {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
 .splash-screen {
   position: fixed;
   top: 0; left: 0;
@@ -345,6 +350,23 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   color: #06b6d4;
+  margin-bottom: 2rem;
+}
+
+.splash-progress-container {
+  width: 180px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.splash-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #06b6d4, #a855f7);
+  border-radius: 4px;
+  animation: progressFill 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
 }
 
 /* Modal Styles */

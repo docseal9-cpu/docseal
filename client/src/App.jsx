@@ -110,6 +110,9 @@ function App() {
         <div className="splash-content">
           <img src={logo} alt="DocSeal Logo" className="splash-logo" />
           <h1 className="splash-text">DocSeal</h1>
+          <div className="splash-progress-container">
+            <div className="splash-progress-fill"></div>
+          </div>
         </div>
       </div>
     );
