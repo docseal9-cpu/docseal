@@ -4,7 +4,13 @@ import { supabase } from '../supabaseClient';
 export default function Sidebar() {
   const handleSignOut = async () => {
     sessionStorage.removeItem('recoveryPassword');
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error('Sign out error:', e);
+    }
+    localStorage.clear();
+    window.location.href = '/';
   };
 
   return (
