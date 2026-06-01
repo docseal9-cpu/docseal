@@ -289,7 +289,7 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
       </ul>
       {isEmergencyVault && (
         <div style={{ textAlign: 'center', color: '#6366f1', fontSize: '0.8rem', marginTop: '1rem' }}>
-          Build 8 | RP: {(sessionStorage.getItem('recoveryPassword') || localStorage.getItem('recoveryPassword')) ? 'OK' : 'MISSING'} | Type: {pendingAction ? pendingAction.type : 'None'}
+          Build 9 | RP: {(sessionStorage.getItem('recoveryPassword') || localStorage.getItem('recoveryPassword')) ? 'OK' : 'MISSING'} | Type: {pendingAction ? pendingAction.type : 'None'}
         </div>
       )}
 
