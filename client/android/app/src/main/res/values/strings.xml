@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">DocSeal</string>
+    <string name="title_activity_main">DocSeal</string>
+    <string name="package_name">com.docseal.vault</string>
+    <string name="custom_url_scheme">com.docseal.vault</string>
+</resources>
