@@ -356,7 +356,7 @@ export default function EmergencyAssets({ files, onDelete, session }) {
                     whiteSpace: 'nowrap',
                     textOverflow: 'ellipsis'
                   }}>
-                    {contact.recovery_code.substring(0, 4)}{'.'.repeat(40)}
+                    {contact.recovery_code}
                   </code>
                 </div>
               ))}

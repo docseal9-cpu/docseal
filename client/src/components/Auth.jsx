@@ -371,7 +371,7 @@ export default function Auth() {
                       <input className="input-field" type="tel" value={contact2Phone} onChange={(e) => setContact2Phone(e.target.value)} />
                     </div>
                   </div>
-                  <label className="form-label">Contact #2 Emergency Code (Optional)</label>
+                  <label className="form-label">Contact #2 Emergency Code (Access Token)</label>
                   <input
                     type="password"
                     className="input-field"
