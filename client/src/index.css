@@ -210,15 +210,17 @@ body {
   overflow: hidden;
 }
 
-.file-details h4 {
+.file-name {
   font-weight: 500;
   margin-bottom: 0.2rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: white;
+  font-size: 1rem;
 }
 
-.file-details p {
+.file-meta {
   color: var(--text-secondary);
   font-size: 0.85rem;
 }
@@ -1113,6 +1115,10 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+    width: 100%;
+  }
+  .file-info {
+    width: 100%;
   }
   .file-actions {
     width: 100%;
