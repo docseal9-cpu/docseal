@@ -1,6 +1,5 @@
 import { NavLink } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import logo from '../assets/logo.png';
 
 export default function Sidebar() {
   const handleSignOut = async () => {
@@ -17,7 +16,10 @@ export default function Sidebar() {
   return (
     <div className="sidebar animated">
       <div className="sidebar-header">
-        <img src={logo} alt="DocSeal Logo" style={{ height: '32px', width: '32px', borderRadius: '6px', objectFit: 'cover' }} />
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
         DocSeal
       </div>
 
