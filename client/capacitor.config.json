@@ -1,10 +1,5 @@
 {
   "appId": "com.docseal.vault",
   "appName": "DocSeal",
-  "webDir": "dist",
-  "plugins": {
-    "CapacitorHttp": {
-      "enabled": true
-    }
-  }
+  "webDir": "dist"
 }
