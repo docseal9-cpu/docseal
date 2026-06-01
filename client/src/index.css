@@ -1137,6 +1137,7 @@ body {
     align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
+    margin-top: -4rem;
   }
   .landing-nav-simple .btn {
     display: none;
