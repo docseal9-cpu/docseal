@@ -17,11 +17,11 @@ export default function EmergencyAssets({ files, onDelete, session }) {
   });
 
   // Code Generation State
-  const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [showGeneratedCodesModal, setShowGeneratedCodesModal] = useState(false);
+  const [pendingSecurityAction, setPendingSecurityAction] = useState(null); // 'generate' | { type: 'remove_contact', index: number }
   const [verifyPassword, setVerifyPassword] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState(null);
+  const [showGeneratedCodesModal, setShowGeneratedCodesModal] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState(null);
 
   const handleInputChange = (e) => {
@@ -52,18 +52,10 @@ export default function EmergencyAssets({ files, onDelete, session }) {
     }
   };
 
-  const handleRemoveContact = async (indexToRemove) => {
-    try {
-      const newContacts = trustedContacts.filter((_, i) => i !== indexToRemove);
-      const { data, error } = await supabase.auth.updateUser({
-        data: { trusted_contacts: newContacts }
-      });
-
-      if (error) throw error;
-      setTrustedContacts(newContacts);
-    } catch (err) {
-      alert('Failed to remove contact: ' + err.message);
-    }
+  const handleRemoveContact = (indexToRemove) => {
+    setPendingSecurityAction({ type: 'remove_contact', index: indexToRemove });
+    setVerifyPassword('');
+    setVerifyError(null);
   };
 
   const generateSecureKey = () => {
@@ -74,7 +66,7 @@ export default function EmergencyAssets({ files, onDelete, session }) {
     return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
   };
 
-  const handleGenerateCodesSubmit = async (e) => {
+  const handleSecuritySubmit = async (e) => {
     e.preventDefault();
     setIsVerifying(true);
     setVerifyError(null);
@@ -88,66 +80,74 @@ export default function EmergencyAssets({ files, onDelete, session }) {
 
       if (error) throw new Error('Incorrect Master Password');
 
-      // 2. Generate new keys for all existing contacts
-      const updatedContacts = trustedContacts.map(contact => ({
-        ...contact,
-        recovery_code: generateSecureKey()
-      }));
+      // 2. Execute Action
+      if (pendingSecurityAction === 'generate') {
+        const updatedContacts = trustedContacts.map(contact => ({
+          ...contact,
+          recovery_code: generateSecureKey()
+        }));
 
-      // 2.5 Encrypt the Master Password using the combined keys
-      const combinedKeyStr = updatedContacts.map(c => c.recovery_code).join('');
-      const enc = new TextEncoder();
-      const salt = window.crypto.getRandomValues(new Uint8Array(16));
+        // 2.5 Encrypt the Master Password using the combined keys
+        const combinedKeyStr = updatedContacts.map(c => c.recovery_code).join('');
+        const enc = new TextEncoder();
+        const salt = window.crypto.getRandomValues(new Uint8Array(16));
+        
+        const keyMaterial = await window.crypto.subtle.importKey(
+          "raw",
+          enc.encode(combinedKeyStr),
+          { name: "PBKDF2" },
+          false,
+          ["deriveBits", "deriveKey"]
+        );
+
+        const aesKey = await window.crypto.subtle.deriveKey(
+          {
+            name: "PBKDF2",
+            salt: salt,
+            iterations: 100000,
+            hash: "SHA-256"
+          },
+          keyMaterial,
+          { name: "AES-GCM", length: 256 },
+          true,
+          ["encrypt", "decrypt"]
+        );
+
+        const iv = window.crypto.getRandomValues(new Uint8Array(12));
+        const encryptedBuffer = await window.crypto.subtle.encrypt(
+          { name: "AES-GCM", iv: iv },
+          aesKey,
+          enc.encode(verifyPassword)
+        );
+
+        const recovery_payload = {
+          ciphertext: Array.from(new Uint8Array(encryptedBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''),
+          iv: Array.from(iv).map(b => b.toString(16).padStart(2, '0')).join(''),
+          salt: Array.from(salt).map(b => b.toString(16).padStart(2, '0')).join('')
+        };
+
+        // 3. Save to Supabase metadata
+        const { error: dbError } = await supabase.auth.updateUser({
+          data: { 
+            trusted_contacts: updatedContacts,
+            recovery_payload: recovery_payload
+          }
+        });
+
+        if (dbError) throw dbError;
+
+        setTrustedContacts(updatedContacts);
+        setShowGeneratedCodesModal(true);
+      } else if (pendingSecurityAction.type === 'remove_contact') {
+        const newContacts = trustedContacts.filter((_, i) => i !== pendingSecurityAction.index);
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: { trusted_contacts: newContacts }
+        });
+        if (updateError) throw updateError;
+        setTrustedContacts(newContacts);
+      }
       
-      const keyMaterial = await window.crypto.subtle.importKey(
-        "raw",
-        enc.encode(combinedKeyStr),
-        { name: "PBKDF2" },
-        false,
-        ["deriveBits", "deriveKey"]
-      );
-
-      const aesKey = await window.crypto.subtle.deriveKey(
-        {
-          name: "PBKDF2",
-          salt: salt,
-          iterations: 100000,
-          hash: "SHA-256"
-        },
-        keyMaterial,
-        { name: "AES-GCM", length: 256 },
-        true,
-        ["encrypt", "decrypt"]
-      );
-
-      const iv = window.crypto.getRandomValues(new Uint8Array(12));
-      const encryptedBuffer = await window.crypto.subtle.encrypt(
-        { name: "AES-GCM", iv: iv },
-        aesKey,
-        enc.encode(verifyPassword)
-      );
-
-      const recovery_payload = {
-        ciphertext: Array.from(new Uint8Array(encryptedBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''),
-        iv: Array.from(iv).map(b => b.toString(16).padStart(2, '0')).join(''),
-        salt: Array.from(salt).map(b => b.toString(16).padStart(2, '0')).join('')
-      };
-
-      // 3. Save to Supabase metadata
-      const { error: updateError } = await supabase.auth.updateUser({
-        data: { 
-          trusted_contacts: updatedContacts,
-          recovery_payload: recovery_payload
-        }
-      });
-
-      if (updateError) throw updateError;
-
-      setTrustedContacts(updatedContacts);
-      setShowVerificationModal(false);
-      setVerifyPassword('');
-      setShowGeneratedCodesModal(true);
-
+      setPendingSecurityAction(null);
     } catch (err) {
       setVerifyError(err.message);
     } finally {
@@ -220,7 +220,11 @@ export default function EmergencyAssets({ files, onDelete, session }) {
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2.5rem' }}>
           <button 
             className="btn btn-primary" 
-            onClick={() => setShowVerificationModal(true)}
+            onClick={() => {
+              setPendingSecurityAction('generate');
+              setVerifyPassword('');
+              setVerifyError(null);
+            }}
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem', background: '#6366f1' }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
@@ -268,14 +272,16 @@ export default function EmergencyAssets({ files, onDelete, session }) {
         </div>
       )}
 
-      {/* Verification Modal for Generating Codes */}
-      {showVerificationModal && (
+      {/* Verification Modal for Generating Codes or Removing Contacts */}
+      {pendingSecurityAction && (
         <div className="modal-overlay animated">
           <div className="modal-card">
             <h3 className="modal-header">Security Authorization</h3>
-            <p className="modal-description">Please enter your Master Password to authorize the generation of cryptographic emergency codes.</p>
+            <p className="modal-description">
+              Please enter your Master Password to authorize {pendingSecurityAction === 'generate' ? 'the generation of cryptographic emergency codes' : 'the removal of a trusted contact'}.
+            </p>
             
-            <form onSubmit={handleGenerateCodesSubmit}>
+            <form onSubmit={handleSecuritySubmit}>
               <div style={{ marginBottom: '1.5rem' }}>
                 <input 
                   type="password" 
@@ -291,9 +297,9 @@ export default function EmergencyAssets({ files, onDelete, session }) {
               {verifyError && <div className="alert-error" style={{ marginBottom: '1.5rem' }}>{verifyError}</div>}
 
               <div className="modal-actions">
-                <button type="button" className="btn btn-danger" onClick={() => setShowVerificationModal(false)} disabled={isVerifying}>Cancel</button>
+                <button type="button" className="btn btn-danger" onClick={() => setPendingSecurityAction(null)} disabled={isVerifying}>Cancel</button>
                 <button type="submit" className="btn btn-primary" disabled={isVerifying}>
-                  {isVerifying ? 'Verifying...' : 'Authorize & Generate'}
+                  {isVerifying ? 'Verifying...' : (pendingSecurityAction === 'generate' ? 'Authorize & Generate' : 'Authorize & Remove')}
                 </button>
               </div>
             </form>
