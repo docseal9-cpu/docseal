@@ -146,19 +146,24 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
   const triggerBrowserDownload = async (blob, fileName) => {
     if (Capacitor.isNativePlatform()) {
       try {
-        const buffer = await blob.arrayBuffer();
-        let binary = '';
-        const bytes = new Uint8Array(buffer);
-        const len = bytes.byteLength;
-        for (let i = 0; i < len; i++) {
-          binary += String.fromCharCode(bytes[i]);
-        }
-        const base64Data = window.btoa(binary);
-        
+        const base64Data = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const result = reader.result;
+            if (typeof result === 'string') {
+              resolve(result.split(',')[1]);
+            } else {
+              reject(new Error('Failed to read file as Base64'));
+            }
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+
         const result = await Filesystem.writeFile({
           path: fileName,
           data: base64Data,
-          directory: Directory.Documents
+          directory: Directory.Cache
         });
         
         await Share.share({
