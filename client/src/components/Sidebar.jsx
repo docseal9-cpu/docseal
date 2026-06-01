@@ -17,7 +17,7 @@ export default function Sidebar() {
   return (
     <div className="sidebar animated">
       <div className="sidebar-header">
-        <img src={logo} alt="DocSeal Logo" style={{ height: '32px', width: '32px', borderRadius: '6px', objectFit: 'cover', mixBlendMode: 'screen' }} />
+        <img src={logo} alt="DocSeal Logo" style={{ height: '32px', width: '32px', borderRadius: '6px', objectFit: 'cover' }} />
         DocSeal
       </div>
 

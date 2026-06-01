@@ -180,7 +180,7 @@ export default function Auth() {
         <div className="landing-page-simple animated">
           <nav className="landing-nav-simple">
             <div className="landing-logo">
-              <img src={logo} alt="DocSeal Logo" className="landing-logo-img" style={{ mixBlendMode: 'screen' }} />
+              <img src={logo} alt="DocSeal Logo" className="landing-logo-img" />
               <span>DocSeal</span>
             </div>
             <button className="btn btn-outline" onClick={() => setView('signin')}>Login</button>
