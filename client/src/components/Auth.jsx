@@ -192,8 +192,8 @@ export default function Auth() {
               <span className="text-cyan">Secured.</span>
             </h1>
             <p className="hero-subtext-simple">
-              Protect your sensitive assets with military-grade encryption and<br />
-              intelligent emergency access management. Zero-knowledge.<br />
+              Protect your sensitive assets with military-grade encryption and
+              intelligent emergency access management. Zero-knowledge.
               Total privacy.
             </p>
             <div className="hero-cta-group-simple">
