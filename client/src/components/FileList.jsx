@@ -34,8 +34,11 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
   const initiateAction = (type, fileId, fileName) => {
     const recoveryPassword = sessionStorage.getItem('recoveryPassword');
 
-    // Fast-path for emergency vault viewers (bypasses prompt completely for view and delete)
-    if (isEmergencyVault && recoveryPassword && (type === 'download' || type === 'delete')) {
+    // Fast-path for emergency vault viewers:
+    // 1. View / Decrypt (type === 'download') -> bypasses prompt
+    // 2. Secure Download (type === 'secure-download') -> bypasses prompt
+    // 3. Delete (type === 'delete') -> falls through to prompt for password!
+    if (isEmergencyVault && recoveryPassword && (type === 'download' || type === 'secure-download')) {
       const action = { type, fileId, fileName };
       // Do not set pendingAction so modal never flickers
       handleVerificationSubmit(null, recoveryPassword, action, true);
