@@ -180,8 +180,8 @@ export default function Auth() {
         <div className="landing-page-simple animated">
           <nav className="landing-nav-simple">
             <div className="landing-logo">
-              <img src={logo} alt="DocSeal Logo" style={{ height: '36px', width: '36px', borderRadius: '8px', objectFit: 'cover' }} />
-              DocSeal
+              <img src={logo} alt="DocSeal Logo" className="landing-logo-img" />
+              <span>DocSeal</span>
             </div>
             <button className="btn btn-outline" onClick={() => setView('signin')}>Login</button>
             <button className="btn btn-primary" onClick={() => { setView('signup'); setError(null); }}>Get Started</button>

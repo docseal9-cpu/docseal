@@ -683,11 +683,19 @@ body {
   left: 4rem;
   top: 2.2rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   font-size: 1.5rem;
   font-weight: 700;
   color: white;
+}
+
+.landing-logo-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  object-fit: cover;
 }
 
 .landing-hero-simple {
@@ -1030,6 +1038,12 @@ body {
   .landing-logo {
     position: static;
     margin-bottom: 2rem;
+  }
+  .landing-logo-img {
+    width: 90px;
+    height: 90px;
+    border-radius: 16px;
+    margin-bottom: 0.25rem;
   }
   .landing-hero-simple {
     margin-top: 0;
