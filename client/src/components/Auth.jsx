@@ -200,8 +200,13 @@ export default function Auth() {
               <button className="btn btn-primary btn-large" onClick={() => { setView('signup'); setError(null); }}>
                 Create Your Vault
               </button>
-              <button className="btn btn-outline btn-large" onClick={() => setView('recover')}>
-                Recover Vault
+              <button className="btn btn-outline btn-large" onClick={() => setView('signin')}>
+                Login to Vault
+              </button>
+            </div>
+            <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+              <button className="auth-link" style={{ color: '#94a3b8', fontSize: '0.95rem' }} onClick={() => setView('recover')}>
+                Lost access? <span style={{ color: '#6366f1' }}>Recover Emergency Vault</span>
               </button>
             </div>
           </main>
