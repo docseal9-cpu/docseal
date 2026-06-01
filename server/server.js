@@ -44,10 +44,13 @@ app.post('/api/recovery-payload', async (req, res) => {
              return res.status(400).json({ error: 'Both contact identities are required for verification.' });
         }
 
+        const normalizePhone = (p) => (p || '').replace(/[\s\-\(\)\+]/g, ''); // strip spaces and common symbols
+        const normalizeName = (n) => (n || '').trim().toLowerCase().replace(/\s+/g, ' ');
+
         const verifyContact = (input, registered) => {
-            return input.name.trim().toLowerCase() === registered.name.trim().toLowerCase() && 
-                   input.email.trim().toLowerCase() === registered.email.trim().toLowerCase() && 
-                   input.phone.trim() === registered.phone.trim();
+            return normalizeName(input.name) === normalizeName(registered.name) && 
+                   (input.email || '').trim().toLowerCase() === (registered.email || '').trim().toLowerCase() && 
+                   normalizePhone(input.phone) === normalizePhone(registered.phone);
         };
 
         const matchForward = verifyContact(contact1, trustedContacts[0]) && verifyContact(contact2, trustedContacts[1]);

@@ -342,8 +342,21 @@ export default function EmergencyAssets({ files, onDelete, session }) {
                       )}
                     </button>
                   </div>
-                  <code style={{ display: 'block', padding: '0.75rem', background: '#000', borderRadius: '4px', color: '#10b981', wordBreak: 'break-all', fontSize: '0.9rem', fontFamily: 'monospace', letterSpacing: '1px' }}>
-                    {contact.recovery_code.substring(0, 4)}{'.'.repeat(56)}
+                  <code style={{ 
+                    display: 'block', 
+                    padding: '0.75rem', 
+                    background: '#000', 
+                    borderRadius: '4px', 
+                    color: '#10b981', 
+                    fontSize: '0.9rem', 
+                    fontFamily: 'monospace', 
+                    letterSpacing: '2px',
+                    textAlign: 'left',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {contact.recovery_code.substring(0, 4)}{'.'.repeat(40)}
                   </code>
                 </div>
               ))}
