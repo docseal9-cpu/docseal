@@ -30,11 +30,10 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
   const initiateAction = async (type, fileId, fileName) => {
     const recoveryPassword = sessionStorage.getItem('recoveryPassword');
     
-    if (recoveryPassword && !(type === 'delete' && requirePasswordForDelete)) {
+    // Always force password verification for deletes, but allow cached passwords for downloads
+    if (recoveryPassword && type !== 'delete') {
       if (type === 'download') {
         await executeDecryptForPreview(fileId, fileName, recoveryPassword);
-      } else if (type === 'delete') {
-        onDelete(fileId);
       } else if (type === 'secure-download') {
         triggerBrowserDownload(previewFile.url, previewFile.name);
         closePreview();
