@@ -201,10 +201,10 @@ export default function Auth() {
               <button className="btn btn-gradient-cyan" onClick={() => { setView('signup'); setError(null); }}>
                 Create Your Vault
               </button>
-              <button className="btn btn-outline-cyan" onClick={() => setView('signin')}>
+              <button className="btn btn-gradient-cyan" onClick={() => setView('signin')}>
                 Login to Vault
               </button>
-              <button className="btn btn-outline-cyan" style={{ borderColor: 'rgba(239, 68, 68, 0.4)', color: '#fca5a5' }} onClick={() => setView('recover')}>
+              <button className="btn btn-gradient-red" onClick={() => setView('recover')}>
                 Recover Emergency Vault
               </button>
             </div>

@@ -285,6 +285,17 @@ body {
   border-color: rgba(6, 182, 212, 0.8);
 }
 
+.btn-gradient-red {
+  background: linear-gradient(90deg, #ef4444 0%, #b91c1c 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+.btn-gradient-red:hover {
+  background: linear-gradient(90deg, #f87171 0%, #dc2626 100%);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
