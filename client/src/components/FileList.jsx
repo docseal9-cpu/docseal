@@ -137,7 +137,10 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
         }
       });
       
-      if (!response.ok) throw new Error('Download failed');
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || 'Download failed');
+      }
       
       // 1. Get the encrypted data from the server
       const encryptedBuffer = await response.arrayBuffer();
@@ -168,7 +171,7 @@ export default function FileList({ files, onDelete, session, requirePasswordForD
       
     } catch (error) {
       console.error('Error downloading file:', error);
-      alert('Failed to decrypt file. Incorrect password or corrupted data.');
+      alert(`Error: ${error.message}`);
     }
   };
 
